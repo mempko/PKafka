@@ -59,7 +59,7 @@ You can use perl 6's reactive programming features to 'tap' Kafka topics and pro
         await $t2;
     }
 
-=head1 REQUIREMENTS
+=head1 DEPENDENCIES
 
 This library wraps the library librdkafka and it requires it to be installed to 
 function.
