@@ -1,0 +1,17 @@
+{
+    "perl"	        : "6",
+    "name"          : "PKafka",
+    "version"       : "*",
+    "description"   : "Apache Kafka client",
+    "authors"   : ["Maxim Noah Khailo"],
+    "depends"       : [],
+    "provides" : {
+        "PKafka::Config"    : "lib/PKafka/Config.pm6",
+        "PKafka::Consumer"  : "lib/PKafka/Consumer.pm6",
+        "PKafka::Kafka"     : "lib/PKafka/Kafka.pm6",
+        "PKafka::Message"   : "lib/PKafka/Message.pm6",
+        "PKafka::Native"    : "lib/PKafka/Native.pm6",
+        "PKafka::Producer"  : "lib/PKafka/Producer.pm6"
+    },
+    "source-url"    : "git://github.com/mempko/PKafka.git"
+}

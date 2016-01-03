@@ -4,8 +4,8 @@
 
 =head1 PKafka
 
-A Perl 6 library for consuming and production Kafka topics. You can use perl 6's
-reactive programming features to 'tap' Kafka topics and process messages.
+A Perl 6 client for Apache Kafka. 
+You can use perl 6's reactive programming features to 'tap' Kafka topics and process messages.
 
 =head1 SYNOPSIS
 
