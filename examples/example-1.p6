@@ -1,4 +1,3 @@
-use lib '../lib';
 use PKafka::Consumer;
 use PKafka::Message;
 use PKafka::Producer;
