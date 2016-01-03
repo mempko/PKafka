@@ -72,7 +72,7 @@ class PKafka::TopicConfig
     submethod BUILD(:%props) 
     {
         $!conf = PKafka::rd_kafka_topic_conf_new();
-        for %props.kv -> $k, $v { self.set($k, $v); }
+        for %props.kv -> $k, $v { self!set($k, $v); }
     }
 
     submethod DESTROY 
