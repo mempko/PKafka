@@ -121,9 +121,9 @@ class PKafka::Consumer
     method stop(Int $partition) 
     {
         return if %!running{$partition} == False;
-        %!running{$partition} = False;
         my $res = PKafka::rd_kafka_consume_stop($!topic, $partition);
         die "Error stopping consuming partition $partition of topic { self.topic }: { PKafka::errno2str() }" if $res == -1;
+        %!running{$partition} = False;
     }
 
     method stop-all
