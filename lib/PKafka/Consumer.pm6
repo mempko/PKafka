@@ -40,15 +40,12 @@ class PKafka::Consumer
 
     submethod BUILD(
         Str :$topic!, 
-        PKafka::Config :$config, 
-        PKafka::TopicConfig :$topic-config,
+        PKafka::Config :$!config = PKafka::Config.new, 
+        PKafka::TopicConfig :$!topic-config = PKafka::TopicConfig.new,
         Str :$brokers!) 
     {
         $!message-supplier = Supplier.new;
         $!messages = $!message-supplier.Supply;
-
-        $!config = $config ?? $config !! PKafka::Config.new;
-        $!topic-config = $topic-config ?? $topic-config !! PKafka::TopicConfig.new; 
 
         $!kafka = PKafka::Kafka.new( type=>PKafka::RD_KAFKA_CONSUMER, conf=>$!config);
         PKafka::gaurded_rd_kafka_brokers_add($!kafka.handle, $brokers);
