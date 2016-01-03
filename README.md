@@ -1,13 +1,11 @@
-=pod
+PKafka
+======
 
-=encoding utf8
-
-=head1 PKafka
-
-A Perl 6 client for L<Apache Kafka | https://kafka.apache.org/>. 
+A Perl 6 client for [Apache Kafka](https://kafka.apache.org/). 
 You can use perl 6's reactive programming features to 'tap' Kafka topics and process messages.
 
-=head1 SYNOPSIS
+SYNOPSIS
+======
 
     use PKafka::Consumer;
     use PKafka::Message;
@@ -59,7 +57,8 @@ You can use perl 6's reactive programming features to 'tap' Kafka topics and pro
         await $t2;
     }
 
-=head1 DEPENDENCIES
+DEPENDENCIES
+======
 
-This library wraps L<librdkafka | https://github.com/edenhill/librdkafka> and it requires it to be installed to function.
+This library wraps [librdkafka](https://github.com/edenhill/librdkafka) and it requires it to be installed to function.
 
