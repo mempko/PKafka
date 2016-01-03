@@ -2,7 +2,7 @@ PKafka
 ======
 
 A Perl 6 client for [Apache Kafka](https://kafka.apache.org/). 
-You can use perl 6's reactive programming features to 'tap' Kafka topics and process messages.
+You can use Perl 6's reactive programming features to 'tap' Kafka topics and process messages.
 
 SYNOPSIS
 ======
@@ -61,4 +61,9 @@ DEPENDENCIES
 ======
 
 This library wraps [librdkafka](https://github.com/edenhill/librdkafka) and it requires it to be installed to function.
+
+WARNING
+======
+
+This library is ALPHA quality software. Please report any bugs and contribute fixes.
 
