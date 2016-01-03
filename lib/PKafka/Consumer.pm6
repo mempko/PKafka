@@ -120,22 +120,22 @@ class PKafka::Consumer
 
     method stop(Int $partition) 
     {
+        return if %!running{$partition} == False;
         %!running{$partition} = False;
         my $res = PKafka::rd_kafka_consume_stop($!topic, $partition);
         die "Error stopping consuming partition $partition of topic { self.topic }: { PKafka::errno2str() }" if $res == -1;
     }
 
-    method stop-all() 
+    method stop-all
     {
-        for %!running.kv -> $k, $v 
-        {
-            next if $v == True;
-            my $res = PKafka::rd_kafka_consume_stop($!topic, $k);
-            die "Error stopping consuming partition $k on of topic { self.topic }: { PKafka::errno2str() }" if $res == -1;
-        }
+        for %!running.kv -> $k, $v { self.stop($k) }
     }
 
     method messages { $!messages }
 
-    submethod DESTROY { PKafka::rd_kafka_topic_destroy($!topic) }
+    submethod DESTROY 
+    { 
+        self.stop-all;
+        PKafka::rd_kafka_topic_destroy($!topic);
+    }
 }
