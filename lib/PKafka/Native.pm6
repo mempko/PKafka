@@ -23,7 +23,7 @@ use NativeCall;
 use NativeCall;
 unit module PKafka;
 
-my $errno := cglobal('libc.so.6', 'errno', int);
+my $errno := cglobal(Str, 'errno', int);
 
 enum rd_kafka_type_t(
     RD_KAFKA_PRODUCER => 0,
