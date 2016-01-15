@@ -23,6 +23,17 @@ use NativeCall;
 use NativeCall;
 unit module PKafka;
 
+class PKafka::X::NoBrokersSpecified is Exception
+{
+    method message {"No brokers specified"}
+};
+
+class PKafka::X::NoValidBrokers is Exception
+{
+    has $.brokers;
+    method message {"No valid brokers specified $.brokers"}
+};
+
 my $errno := cglobal(Str, 'errno', int);
 
 enum rd_kafka_type_t(
@@ -195,9 +206,9 @@ our sub rd_kafka_brokers_add(Pointer, Str) returns int is native('rdkafka', v1) 
 
 our sub gaurded_rd_kafka_brokers_add(Pointer $kafka, Str $brokers = "")
 {
-    die "No brokers specified" if $brokers.chars == 0;
+    die PKafka::X::NoBrokersSpecified.new if $brokers.chars == 0;
     my $added = rd_kafka_brokers_add($kafka, $brokers);
-    die "No valid brokers specified $brokers" if $added == 0;
+    die PKafka::X::NoValidBrokers.new(:$brokers) if $added == 0;
 }
 
 our $RD_KAFKA_OFFSET_BEGINNING = -2;

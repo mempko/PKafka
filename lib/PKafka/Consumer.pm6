@@ -26,6 +26,27 @@ use PKafka::Kafka;
 use PKafka::Config;
 use PKafka::Message;
 
+class PKafka::X::ConsumeError is Exception {
+   has $.topic;
+   has $.partition;
+   has $.offset;
+};
+
+class PKafka::X::ConsumeCalledTwice is PKafka::X::ConsumeError 
+{
+    method message {"Called consume twice for topic $.topic and partition $.partition"}
+};
+
+class PKafka::X::ErrorStartingConsume is PKafka::X::ConsumeError 
+{
+    method message {"Error starting to consume partition $.partition of topic $.topic at offset $.offset: { PKafka::errno2str() }"}
+}
+
+class PKafka::X::ErrorStoppingConsume is PKafka::X::ConsumeError 
+{
+    method message {"Error stopping consuming partition $.partition of topic $.topic: { PKafka::errno2str() }"}
+}
+
 class PKafka::Consumer 
 {
     has Pointer $!topic;
@@ -69,10 +90,10 @@ class PKafka::Consumer
 
     method consume(Int :$partition, Int :$offset) 
     {
-        die "Called consume twice" if %!running{$partition};
+        die PKafka::X::ConsumeCalledTwice(topic=>self.topic, :$partition) if %!running{$partition};
 
         my $res = PKafka::rd_kafka_consume_start($!topic, $partition, $offset);
-        die "Error starting parrition $partition of topic { self.topic } at offset $offset: { PKafka::errno2str() }" if $res == -1;
+        die PKafka::X::ErrorStartingConsume(topic=>self.topic, :$partition, :$offset) if $res == -1;
         %!running{$partition} = True;
 
         start 
@@ -119,7 +140,7 @@ class PKafka::Consumer
     {
         return if %!running{$partition} == False;
         my $res = PKafka::rd_kafka_consume_stop($!topic, $partition);
-        die "Error stopping consuming partition $partition of topic { self.topic }: { PKafka::errno2str() }" if $res == -1;
+        die PKafka::ErrorStoppingConsume(topic=>self.topic, :$partition) if $res == -1;
         %!running{$partition} = False;
     }
 

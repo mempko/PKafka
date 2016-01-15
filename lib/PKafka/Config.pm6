@@ -23,12 +23,34 @@ use NativeCall;
 use NativeCall;
 use PKafka::Native;
 
+class PKafka::X::BadConfig is Exception {
+   has $.name;
+   has $.value;
+   has $.errstr;
+};
+
+class PKafka::X::UnknownConfigOption is PKafka::X::BadConfig 
+{
+    method message {"$.name config option is unknown: $.errstr"}
+};
+
+class PKafka::X::InvalidConfigValue is PKafka::X::BadConfig 
+{
+    method message {"The value $.value for config option $.name is invalid: $.errstr"}
+}
+
 sub validate_set($r, $errstr, $name, $value)
 {
     given $r
     {
-        when PKafka::RD_KAFKA_CONF_UNKNOWN { die "$name config option is unknown: $errstr";}
-        when PKafka::RD_KAFKA_CONF_INVALID { die "The value $value for config option $name is invalid: $errstr";}
+        when PKafka::RD_KAFKA_CONF_UNKNOWN 
+        { 
+            die PKafka::X::UnknownConfigOption.new(:$name, :$value, :$errstr);
+        }
+        when PKafka::RD_KAFKA_CONF_INVALID 
+        { 
+            die PKafka::X::InvalidConfigValue.new(:$name, :$value, :$errstr);
+        }
     }
 }
 
