@@ -24,7 +24,7 @@ use NativeCall;
 use PKafka::Native;
 use PKafka::Config;
 
-class PKafka::X::ErrorCreatingKafka is Exception
+class PKafka::X::CreatingKafka is Exception
 {
     has $.errstr;
     method message {"Error creating kafka object: $.errstr"}
@@ -41,7 +41,7 @@ class PKafka::Kafka
     submethod BUILD(PKafka::rd_kafka_type_t :$type, PKafka::Config :$conf)
     {
         my ($pointer, $errstr) = PKafka::rd_kafka_new($type, $conf.handle);
-        die PKafka::X::ErrorCreatingKafka.new(:$errstr) if $pointer == 0;
+        die PKafka::X::CreatingKafka.new(:$errstr) if $pointer == 0;
         $!kafka = $pointer;
     }
 
