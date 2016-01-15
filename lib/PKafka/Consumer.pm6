@@ -47,6 +47,18 @@ class PKafka::X::ErrorStoppingConsume is PKafka::X::ConsumeError
     method message {"Error stopping consuming partition $.partition of topic $.topic: { PKafka::errno2str() }"}
 }
 
+class PKafka::X::ErrorStoringOffset is PKafka::X::ConsumeError 
+{
+    has $.err;
+    method message {"Error storing offset $.offset for partition $.partition of topic $.topic: { PKafka::rd_kafka_err2str($.err) }"}
+}
+
+class PKafka::X::ExpectedDifferentTopic is PKafka::X::ConsumeError
+{
+    has $.actual-topic;
+    method message {"Error storing offset $.offset for partition $.partition of topic $.topic: Got message from topic $.actual-topic. Make sure to call save-offset with message from correct topic."}
+}
+
 class PKafka::Consumer 
 {
     has Pointer $!topic;
@@ -150,6 +162,34 @@ class PKafka::Consumer
     }
 
     method messages { $!messages }
+
+    multi method save-offset(Int :$partition, Int :$offset) 
+    {
+        my $res = PKafka::rd_kafka_offset_store($!topic, $partition, $offset);
+
+        if $res != PKafka::RD_KAFKA_RESP_ERR_NO_ERROR 
+        {
+            die PKafka::X::ErrorStoringOffset.new(
+                :$partition, 
+                :$offset, 
+                topic=>self.topic, 
+                err=>$res); 
+        }
+    }
+
+    multi method save-offset(PKafka::Message $m)
+    {
+        if $m.topic ne self.topic 
+        {
+            die PKafka::X::ExpectedDifferentTopic(
+                partition=>$m.partition, 
+                offset=>$m.offset, 
+                topic=>self.topic,
+                actual-topic=>$m.topic);
+        }
+
+        self.save-offset(partition=>$m.partition, offset=>$m.offset);
+    }
 
     submethod DESTROY 
     { 

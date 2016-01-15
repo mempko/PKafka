@@ -201,6 +201,13 @@ our sub rd_kafka_consume_start(Pointer, int32, int64) returns int is native('rdk
 #int rd_kafka_consume_stop (rd_kafka_topic_t *rkt, int32_t partition);
 our sub rd_kafka_consume_stop(Pointer, int32) returns int is native('rdkafka', v1) { * }
 
+#rd_kafka_resp_err_t rd_kafka_offset_store (rd_kafka_topic_t *rkt, int32_t partition, int64_t offset);
+our sub _rd_kafka_offset_store(Pointer, int32, int64) returns int32 is native('rdkafka', v1) is symbol('rd_kafka_offset_store') { * }
+our sub rd_kafka_offset_store(Pointer $topic, int32 $partition, int64 $offset) returns rd_kafka_resp_err_t
+{
+    rd_kafka_resp_err_t(_rd_kafka_offset_store($topic, $partition, $offset));
+}
+
 #int rd_kafka_brokers_add (rd_kafka_t *rk, const char *brokerlist);
 our sub rd_kafka_brokers_add(Pointer, Str) returns int is native('rdkafka', v1) { * }
 
