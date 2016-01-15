@@ -26,34 +26,38 @@ use PKafka::Kafka;
 use PKafka::Config;
 use PKafka::Message;
 
-class PKafka::X::ConsumeError is Exception {
+class PKafka::X::Consume is Exception {
    has $.topic;
    has $.partition;
    has $.offset;
+   has $.errstr;
 };
 
-class PKafka::X::ConsumeCalledTwice is PKafka::X::ConsumeError 
+class PKafka::X::ConsumeCalledTwice is PKafka::X::Consume 
 {
     method message {"Called consume twice for topic $.topic and partition $.partition"}
 };
 
-class PKafka::X::ErrorStartingConsume is PKafka::X::ConsumeError 
+class PKafka::X::StartingConsume is PKafka::X::Consume 
 {
-    method message {"Error starting to consume partition $.partition of topic $.topic at offset $.offset: { PKafka::errno2str() }"}
+    submethod BUILD { self.errstr = PKafka::errno2str() }
+    method message {"Error starting to consume partition $.partition of topic $.topic at offset $.offset: $.errstr"}
 }
 
-class PKafka::X::ErrorStoppingConsume is PKafka::X::ConsumeError 
+class PKafka::X::StoppingConsume is PKafka::X::Consume 
 {
-    method message {"Error stopping consuming partition $.partition of topic $.topic: { PKafka::errno2str() }"}
+    submethod BUILD { self.errstr = PKafka::errno2str() }
+    method message {"Error stopping consuming partition $.partition of topic $.topic: $.errstr"}
 }
 
-class PKafka::X::ErrorStoringOffset is PKafka::X::ConsumeError 
+class PKafka::X::StoringOffset is PKafka::X::Consume 
 {
-    has $.err;
-    method message {"Error storing offset $.offset for partition $.partition of topic $.topic: { PKafka::rd_kafka_err2str($.err) }"}
+    has $.error-code;
+    submethod BUILD(:$!error-code) { self.errstr = PKafka::rd_kafka_err2str($!error-code)}
+    method message {"Error storing offset $.offset for partition $.partition of topic $.topic: $.errstr"}
 }
 
-class PKafka::X::ExpectedDifferentTopic is PKafka::X::ConsumeError
+class PKafka::X::ExpectedDifferentTopic is PKafka::X::Consume
 {
     has $.actual-topic;
     method message {"Error storing offset $.offset for partition $.partition of topic $.topic: Got message from topic $.actual-topic. Make sure to call save-offset with message from correct topic."}
@@ -152,7 +156,7 @@ class PKafka::Consumer
     {
         return if %!running{$partition} == False;
         my $res = PKafka::rd_kafka_consume_stop($!topic, $partition);
-        die PKafka::ErrorStoppingConsume(topic=>self.topic, :$partition) if $res == -1;
+        die PKafka::StoppingConsume(topic=>self.topic, :$partition) if $res == -1;
         %!running{$partition} = False;
     }
 
@@ -169,7 +173,7 @@ class PKafka::Consumer
 
         if $res != PKafka::RD_KAFKA_RESP_ERR_NO_ERROR 
         {
-            die PKafka::X::ErrorStoringOffset.new(
+            die PKafka::X::StoringOffset.new(
                 :$partition, 
                 :$offset, 
                 topic=>self.topic, 

@@ -25,11 +25,13 @@ use PKafka::Native;
 use PKafka::Kafka;
 use PKafka::Config;
 
-class PKafka::X::ErrorProducingMessage is Exception
+class PKafka::X::ProducingMessage is Exception
 {
     has $.partition;
     has $.topic;
-    method message {"Error producing message to partition $.partition for topic $.topic: {PKafka::errno2str}"}
+    has $.errstr;
+    submethod BUILD { $!errstr = PKafka::errno2str() }
+    method message {"Error producing message to partition $.partition for topic $.topic: $.errstr"}
 };
 
 class PKafka::Producer 
@@ -79,7 +81,7 @@ class PKafka::Producer
             $!topic, $p, $msgops,
             $payload, $payload.elems, $key, $key.elems, $msg-opaque);
 
-        die PKafka::X::ErrorProducingMessage.new(:$partition, topic=>self.topic) if $res == -1;
+        die PKafka::X::ProducingMessage.new(:$partition, topic=>self.topic) if $res == -1;
     }
 
     submethod DESTROY { PKafka::rd_kafka_topic_destroy($!topic) }
