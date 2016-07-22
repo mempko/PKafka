@@ -24,6 +24,19 @@ use NativeCall;
 use PKafka::Native;
 use PKafka::Config;
 
+#This is here instead of PKafka::Native because of a compiler bug.
+class rd_kafka_metadata_t is repr('CStruct') {
+    has int32   $.broker_cnt;   
+    has Pointer $.brokers;   #rd_kafka_metadata_broker
+    has int32   $.topic_cnt;
+    has Pointer $.topics;   #rd_kafka_metadata_topic
+    has int32   $.orig_broker_id;
+    has Str $.orig_broker_name; 
+};
+
+#rd_kafka_resp_err_t rd_kafka_metadata (rd_kafka_t *rk, int all_topics, rd_kafka_topic_t *only_rkt, const struct rd_kafka_metadata **metadatap, int timeout_ms); 
+our sub _rd_kafka_metadata (Pointer, int32, Pointer, Pointer, int32) returns int32 is native('rdkafka', v1) is symbol('rd_kafka_metadata') {*}; 
+
 class PKafka::X::CreatingKafka is Exception
 {
     has $.errstr;

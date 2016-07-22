@@ -38,7 +38,7 @@ class rd_kafka_message_t is repr('CStruct') {
 
 
 #rd_kafka_message_t *rd_kafka_consume (rd_kafka_topic_t *rkt, int32_t partition, int timeout_ms);
-our sub rd_kafka_consume(Pointer, int32, int) returns Pointer[rd_kafka_message_t] is native('rdkafka', v1) { * }
+our sub rd_kafka_consume(Pointer, int32, int32) returns Pointer[rd_kafka_message_t] is native('rdkafka', v1) { * }
 
 class PKafka::Message
 {

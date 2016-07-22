@@ -196,10 +196,10 @@ our sub rd_kafka_topic_destroy(Pointer) is native('rdkafka', v1) { * }
 our sub rd_kafka_topic_name(Pointer) returns Str is native('rdkafka', v1) { * }
 
 #int rd_kafka_consume_start (rd_kafka_topic_t *rkt, int32_t partition, int64_t offset);
-our sub rd_kafka_consume_start(Pointer, int32, int64) returns int is native('rdkafka', v1) { * }
+our sub rd_kafka_consume_start(Pointer, int32, int64) returns int32 is native('rdkafka', v1) { * }
 
 #int rd_kafka_consume_stop (rd_kafka_topic_t *rkt, int32_t partition);
-our sub rd_kafka_consume_stop(Pointer, int32) returns int is native('rdkafka', v1) { * }
+our sub rd_kafka_consume_stop(Pointer, int32) returns int32 is native('rdkafka', v1) { * }
 
 #rd_kafka_resp_err_t rd_kafka_offset_store (rd_kafka_topic_t *rkt, int32_t partition, int64_t offset);
 our sub _rd_kafka_offset_store(Pointer, int32, int64) returns int32 is native('rdkafka', v1) is symbol('rd_kafka_offset_store') { * }
@@ -209,7 +209,7 @@ our sub rd_kafka_offset_store(Pointer $topic, int32 $partition, int64 $offset) r
 }
 
 #int rd_kafka_brokers_add (rd_kafka_t *rk, const char *brokerlist);
-our sub rd_kafka_brokers_add(Pointer, Str) returns int is native('rdkafka', v1) { * }
+our sub rd_kafka_brokers_add(Pointer, Str) returns int32 is native('rdkafka', v1) { * }
 
 our sub gaurded_rd_kafka_brokers_add(Pointer $kafka, Str $brokers = "")
 {
@@ -234,4 +234,4 @@ enum msg_options(
 
 #int rd_kafka_produce (rd_kafka_topic_t *rkt, int32_t partitition, int msgflags, void *payload, size_t len, const void *key, size_t keylen, void *msg_opaque); 
 #
-our sub rd_kafka_produce(Pointer, int32, int, Blob, uint64, Str, uint64, Pointer) returns int is native('rdkafka', v1) { * }
+our sub rd_kafka_produce(Pointer, int32, int32, Blob, uint64, Str, uint64, Pointer) returns int32 is native('rdkafka', v1) { * }
