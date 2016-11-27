@@ -1,7 +1,7 @@
 {
     "perl"	        : "6",
     "name"          : "PKafka",
-    "version"       : "*",
+    "version"       : "0.1",
     "description"   : "Apache Kafka client",
     "authors"   : ["Maxim Noah Khailo"],
     "depends"       : [],
