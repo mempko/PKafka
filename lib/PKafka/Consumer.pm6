@@ -30,7 +30,7 @@ class PKafka::X::Consuming is Exception {
    has $.topic;
    has $.partition;
    has $.offset;
-   has $.errstr;
+   has $.errstr is rw;
 };
 
 class PKafka::X::ConsumeCalledTwice is PKafka::X::Consuming 
@@ -109,7 +109,7 @@ class PKafka::Consumer
         die PKafka::X::ConsumeCalledTwice(topic=>self.topic, :$partition) if %!running{$partition};
 
         my $res = PKafka::rd_kafka_consume_start($!topic, $partition, $offset);
-        die PKafka::X::StartingConsumer(topic=>self.topic, :$partition, :$offset) if $res == -1;
+        die PKafka::X::StartingConsumer.new(topic=>self.topic, :$partition, :$offset) if $res == -1;
         %!running{$partition} = True;
 
         start 
@@ -156,7 +156,7 @@ class PKafka::Consumer
     {
         return if %!running{$partition} == False;
         my $res = PKafka::rd_kafka_consume_stop($!topic, $partition);
-        die PKafka::X::StoppingConsumer(topic=>self.topic, :$partition) if $res == -1;
+        die PKafka::X::StoppingConsumer.new(topic=>self.topic, :$partition) if $res == -1;
         %!running{$partition} = False;
     }
 
@@ -185,7 +185,7 @@ class PKafka::Consumer
     {
         if $m.topic ne self.topic 
         {
-            die PKafka::X::StoringOffsetForWrongTopic(
+            die PKafka::X::StoringOffsetForWrongTopic.new(
                 partition=>$m.partition, 
                 offset=>$m.offset, 
                 topic=>self.topic,

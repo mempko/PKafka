@@ -20,7 +20,7 @@ use NativeCall;
 
 =end license
 
-use NativeCall;
+use NativeCall :ALL;
 unit module PKafka;
 
 class PKafka::X::DidNotSpecifyBrokers is Exception
@@ -92,12 +92,12 @@ our sub rd_kafka_version_str() returns Str is native('rdkafka', v1) { * };
 #const char* rd_kafka_err2str(rd_kafka_resp_err_t)
 our sub rd_kafka_err2str(int32) returns Str is native('rdkafka', v1) { * };
 our sub _rd_kafka_errno2err (int32) returns int32 is native('rdkafka', v1) is symbol('rd_kafka_errno2err') { * };
-our sub rd_kafka_errno2err (int32 $errnox) returns rd_kafka_resp_err_t 
+our sub rd_kafka_errno2err (int $errnox) returns rd_kafka_resp_err_t 
 {
     rd_kafka_resp_err_t(_rd_kafka_errno2err($errnox))
 }
 
-our sub errno2str() { rd_kafka_err2str(rd_kafka_errno2err($errno)); }
+our sub errno2str() { my $e = $errno; rd_kafka_err2str(rd_kafka_errno2err($e)); }
 
 #void rd_kafka_message_destroy (rd_kafka_message_t *rkmessage);
 our sub rd_kafka_message_destroy(Pointer) is native('rdkafka', v1) { * };
