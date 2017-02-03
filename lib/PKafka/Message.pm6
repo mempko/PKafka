@@ -23,29 +23,12 @@ use NativeCall;
 use NativeCall;
 use PKafka::Native;
 
-#This is here instead of PKafka::Native because of a compiler bug.
-class rd_kafka_message_t is repr('CStruct') {
-    has int32   $.err;   
-    has Pointer $.rkt;
-    has int32   $.partition;
-    has CArray[uint8] $.payload;
-    has uint64  $.len;
-    has CArray[uint8] $.key; 
-    has uint64  $.key-len; 
-    has int64   $.offset;
-    has Pointer $._private;
-};
-
-
-#rd_kafka_message_t *rd_kafka_consume (rd_kafka_topic_t *rkt, int32_t partition, int timeout_ms);
-our sub rd_kafka_consume(Pointer, int32, int32) returns Pointer[rd_kafka_message_t] is native('rdkafka', v1) { * }
-
 class PKafka::Message
 {
-    has rd_kafka_message_t $!message;
-    has Pointer[rd_kafka_message_t] $!message-ptr;
+    has PKafka::rd_kafka_message_t $!message;
+    has Pointer[PKafka::rd_kafka_message_t] $!message-ptr;
 
-    submethod BUILD(Pointer[rd_kafka_message_t] :$msg)
+    submethod BUILD(Pointer[PKafka::rd_kafka_message_t] :$msg)
     {
         $!message-ptr = $msg;
         $!message = $!message-ptr.deref;

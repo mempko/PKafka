@@ -235,3 +235,21 @@ enum msg_options(
 #int rd_kafka_produce (rd_kafka_topic_t *rkt, int32_t partitition, int msgflags, void *payload, size_t len, const void *key, size_t keylen, void *msg_opaque); 
 #
 our sub rd_kafka_produce(Pointer, int32, int32, Blob, uint64, Str, uint64, Pointer) returns int32 is native('rdkafka', v1) { * }
+
+#This is here instead of PKafka::Native because of a compiler bug.
+class rd_kafka_message_t is repr('CStruct') {
+    has int32   $.err;   
+    has Pointer $.rkt;
+    has int32   $.partition;
+    has CArray[uint8] $.payload;
+    has uint64  $.len;
+    has CArray[uint8] $.key; 
+    has uint64  $.key-len; 
+    has int64   $.offset;
+    has Pointer $._private;
+};
+
+
+#rd_kafka_message_t *rd_kafka_consume (rd_kafka_topic_t *rkt, int32_t partition, int timeout_ms);
+our sub rd_kafka_consume(Pointer, int32, int32) returns Pointer[rd_kafka_message_t] is native('rdkafka', v1) { * }
+
