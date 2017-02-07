@@ -26,6 +26,10 @@ use PKafka::Kafka;
 use PKafka::Config;
 use PKafka::Message;
 
+#rd_kafka_message_t *rd_kafka_consume (rd_kafka_topic_t *rkt, int32_t partition, int timeout_ms);
+our sub rd_kafka_consume(Pointer, int32, int32) returns Pointer[PKafka::rd_kafka_message_t] is native('rdkafka', v1) { * }
+
+
 class PKafka::X::Consuming is Exception {
    has $.topic;
    has $.partition;
@@ -118,7 +122,7 @@ class PKafka::Consumer
             while %!running{$partition}
             {
                 my $timeout-ms = 100;
-                my $msg-ptr = PKafka::rd_kafka_consume($!topic, $partition, $timeout-ms);
+                my $msg-ptr = rd_kafka_consume($!topic, $partition, $timeout-ms);
 
                 next if not $msg-ptr;
 
